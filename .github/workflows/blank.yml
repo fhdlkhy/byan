@@ -1,0 +1,35 @@
+name: Bayan App Quality Check
+
+# هذا السطر يعني: شغل الاختبار كل ما أرفع تحديث
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. تحميل الكود بتاعك
+    - uses: actions/checkout@v4
+
+    # 2. تجهيز بيئة بايثون
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+
+    # 3. تسطيب المكتبات (عشان يتأكد إن requirements.txt سليم)
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    # 4. اختبار سلامة الكود (Syntax Check)
+    # الخطوة دي بتتأكد إن ملف app.py مفيهوش غلطات كتابية تمنع التشغيل
+    - name: Check Code Integrity
+      run: |
+        python -m py_compile app.py
+        echo "✅ الكود سليم وجاهز للعمل"
